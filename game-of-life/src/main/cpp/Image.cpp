@@ -27,7 +27,7 @@ std::unique_ptr<Image> Image::create(size_t width, size_t height)
    uint8_t *data = new uint8_t[dataSize];
    memset(data, 0x00, dataSize);
    ptrdiff_t dataAddress = reinterpret_cast<ptrdiff_t>(data);
-   ptrdiff_t alignedAddress = ((dataAddress + alignmentPadding) % alignmentSize) * alignmentSize;
+   ptrdiff_t alignedAddress = ((dataAddress + alignmentPadding) / alignmentSize) * alignmentSize;
    return std::unique_ptr<Image>(new Image(width, height, data, reinterpret_cast<uint8_t *>(alignedAddress), stride));
 }
 
