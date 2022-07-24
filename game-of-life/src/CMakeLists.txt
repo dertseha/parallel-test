@@ -5,9 +5,8 @@ project(game-of-life)
 ### Define sources                                             ###
 ##################################################################
 file(GLOB_RECURSE PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/main/cpp *.cpp)
-file(GLOB_RECURSE PROJECT_HEADERS ${PROJECT_SOURCE_DIR}/main/h *.h)
 add_library(${PROJECT_NAME} STATIC)
-target_sources(${PROJECT_NAME} PUBLIC ${PROJECT_HEADERS} PRIVATE ${PROJECT_SOURCES})
+target_sources(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/main/h)
 
 ##################################################################
@@ -22,13 +21,15 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 ##################################################################
 ### Add tests                                                  ###
 ##################################################################
+
 macro(package_add_test TESTNAME TESTSOURCES)
     add_executable(${TESTNAME} ${ARGN})
     target_link_libraries(${TESTNAME} PUBLIC project-settings PRIVATE ${PROJECT_NAME} GTest::gtest_main)
     target_sources(${TESTNAME} PRIVATE ${TESTSOURCES})
 
     include(GoogleTest)
-    gtest_discover_tests(${TESTNAME})
+    include_directories("${gtest_SOURCE_DIR}/include")
+    gtest_add_tests(TARGET ${TESTNAME})
 endmacro()
 
 file(GLOB_RECURSE TEST_SOURCES ${PROJECT_SOURCE_DIR}/test/cpp *.cpp)

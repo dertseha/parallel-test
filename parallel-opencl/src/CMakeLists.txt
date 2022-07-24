@@ -16,7 +16,7 @@ message(STATUS "OpenCL library: ${OpenCL_LIBRARY}")
 ##################################################################
 file(GLOB_RECURSE PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/main/cpp/core *.cpp)
 add_library(${PROJECT_NAME}-core STATIC)
-target_sources(${PROJECT_NAME}-core PUBLIC ${PROJECT_HEADERS} PRIVATE ${PROJECT_SOURCES})
+target_sources(${PROJECT_NAME}-core PRIVATE ${PROJECT_SOURCES})
 target_include_directories(${PROJECT_NAME}-core PUBLIC ${PROJECT_SOURCE_DIR}/main/h)
 
 ##################################################################
@@ -42,6 +42,7 @@ macro(package_add_test TESTNAME TESTSOURCES)
     target_sources(${TESTNAME} PRIVATE ${TESTSOURCES})
 
     include(GoogleTest)
+    include_directories("${gtest_SOURCE_DIR}/include")
     gtest_discover_tests(${TESTNAME})
 endmacro()
 
