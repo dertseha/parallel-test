@@ -4,12 +4,7 @@
 
 using gol::Image;
 
-class ImageTest : public testing::Test
-{
-public:
-};
-
-TEST_F(ImageTest, createReturnsInstance)
+TEST(ImageTest, createReturnsInstance)
 {
    auto image = Image::create(2, 3);
    EXPECT_EQ(static_cast<size_t>(2), image->getWidth());
