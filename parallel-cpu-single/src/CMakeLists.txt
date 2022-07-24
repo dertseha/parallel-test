@@ -4,7 +4,7 @@ project(parallel-cpu-single)
 ##################################################################
 ### Define sources                                             ###
 ##################################################################
-file(GLOB_RECURSE PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/main/cpp/core *.cpp)
+file(GLOB_RECURSE PROJECT_SOURCES "${PROJECT_SOURCE_DIR}/main/cpp/core/*.cpp")
 add_library(${PROJECT_NAME}-core STATIC)
 target_sources(${PROJECT_NAME}-core PRIVATE ${PROJECT_SOURCES})
 target_include_directories(${PROJECT_NAME}-core PUBLIC ${PROJECT_SOURCE_DIR}/main/h)
@@ -28,7 +28,13 @@ target_link_libraries(${PROJECT_NAME}
 ##################################################################
 macro(package_add_test TESTNAME TESTSOURCES)
     add_executable(${TESTNAME} ${ARGN})
-    target_link_libraries(${TESTNAME} PUBLIC project-settings PRIVATE ${PROJECT_NAME}-core GTest::gtest_main)
+    target_link_libraries(${TESTNAME}
+            PUBLIC
+            project-settings
+            PRIVATE
+            ${PROJECT_NAME}-core
+            GTest::gtest_main
+            )
     target_sources(${TESTNAME} PRIVATE ${TESTSOURCES})
 
     include(GoogleTest)
@@ -36,5 +42,5 @@ macro(package_add_test TESTNAME TESTSOURCES)
     gtest_add_tests(TARGET ${TESTNAME})
 endmacro()
 
-file(GLOB_RECURSE TEST_SOURCES ${PROJECT_SOURCE_DIR}/test/cpp *.cpp)
+file(GLOB_RECURSE TEST_SOURCES "${PROJECT_SOURCE_DIR}/test/cpp/*.cpp")
 package_add_test(${PROJECT_NAME}-test ${TEST_SOURCES})
