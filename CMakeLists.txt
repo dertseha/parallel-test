@@ -24,4 +24,5 @@ add_library(project-settings INTERFACE)
 target_compile_features(project-settings INTERFACE cxx_std_17)
 
 
+add_subdirectory(game-of-life/src)
 add_subdirectory(parallel-opencl/src)
