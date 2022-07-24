@@ -22,7 +22,7 @@ target_include_directories(${PROJECT_NAME}-core PUBLIC ${PROJECT_SOURCE_DIR}/mai
 ##################################################################
 ### Apply all settings                                         ###
 ##################################################################
-target_link_libraries(${PROJECT_NAME}-core PUBLIC project-settings PRIVATE ${OpenCL_LIBRARY})
+target_link_libraries(${PROJECT_NAME}-core PUBLIC project-settings game-of-life PRIVATE ${OpenCL_LIBRARY})
 target_compile_options(${PROJECT_NAME}-core PRIVATE
         $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:-Wall>
         $<$<CXX_COMPILER_ID:MSVC>:-W4>
@@ -43,7 +43,7 @@ macro(package_add_test TESTNAME TESTSOURCES)
 
     include(GoogleTest)
     include_directories("${gtest_SOURCE_DIR}/include")
-    gtest_discover_tests(${TESTNAME})
+    gtest_add_tests(TARGET ${TESTNAME})
 endmacro()
 
 file(GLOB_RECURSE TEST_SOURCES ${PROJECT_SOURCE_DIR}/test/cpp *.cpp)

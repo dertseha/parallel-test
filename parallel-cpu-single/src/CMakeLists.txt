@@ -6,17 +6,13 @@ project(parallel-cpu-single)
 ##################################################################
 file(GLOB_RECURSE PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/main/cpp/core *.cpp)
 add_library(${PROJECT_NAME}-core STATIC)
-target_link_libraries(${PROJECT_NAME}-core
-        PRIVATE
-        game-of-life
-        )
 target_sources(${PROJECT_NAME}-core PRIVATE ${PROJECT_SOURCES})
 target_include_directories(${PROJECT_NAME}-core PUBLIC ${PROJECT_SOURCE_DIR}/main/h)
 
 ##################################################################
 ### Apply all settings                                         ###
 ##################################################################
-target_link_libraries(${PROJECT_NAME}-core PUBLIC project-settings)
+target_link_libraries(${PROJECT_NAME}-core PUBLIC project-settings game-of-life)
 target_compile_options(${PROJECT_NAME}-core PRIVATE
         $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:-Wall>
         $<$<CXX_COMPILER_ID:MSVC>:-W4>
@@ -37,7 +33,7 @@ macro(package_add_test TESTNAME TESTSOURCES)
 
     include(GoogleTest)
     include_directories("${gtest_SOURCE_DIR}/include")
-    gtest_discover_tests(${TESTNAME})
+    gtest_add_tests(TARGET ${TESTNAME})
 endmacro()
 
 file(GLOB_RECURSE TEST_SOURCES ${PROJECT_SOURCE_DIR}/test/cpp *.cpp)

@@ -30,8 +30,6 @@ FetchContent_Declare(
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
-#add_library(GTest::GTest INTERFACE IMPORTED)
-#target_link_libraries(GTest::GTest INTERFACE gtest_main)
 
 add_subdirectory(game-of-life/src)
 add_subdirectory(parallel-cpu-single/src)
