@@ -1,6 +1,7 @@
 #pragma once
 
 #include <istream>
+#include <map>
 
 #include "gol/Image.h"
 
@@ -15,8 +16,9 @@ public:
    void save(std::ostream &out, Image const &in) const;
 
 private:
-   explicit TextFormat(char deadCell);
+   explicit TextFormat(std::map<uint8_t, char> const &charactersByValue);
 
-   char deadCell;
+   std::map<uint8_t, char> charactersByValue;
+   std::map<char, uint8_t> valuesByCharacter;
 };
 }

@@ -3,14 +3,19 @@
 using gol::Image;
 using gol::TextFormat;
 
-TextFormat::TextFormat(char deadCell)
-   : deadCell(deadCell)
+TextFormat::TextFormat(std::map<uint8_t, char> const &charactersByValue)
+   : charactersByValue(charactersByValue)
 {
+   for (auto const &kvp : charactersByValue)
+   {
+      valuesByCharacter[kvp.second] = kvp.first;
+   }
 }
 
 TextFormat TextFormat::withDefaults()
 {
-   return TextFormat('.');
+   static std::map<uint8_t, char> const charactersByValue = { { 0x00, '.' }, { 0xFF, 'O' } };
+   return TextFormat(charactersByValue);
 }
 
 void TextFormat::load(Image &out, std::istream &in) const
@@ -22,11 +27,11 @@ void TextFormat::load(Image &out, std::istream &in) const
       {
          in.get(value);
       }
-      out.getRow(y)[0] = (value == deadCell) ? 0x00 : 0xFF;
+      out.getRow(y)[0] = valuesByCharacter.at(value);
       for (size_t x = 1; x < out.getWidth(); x++)
       {
          in.get(value);
-         out.getRow(y)[x] = (value == deadCell) ? 0x00 : 0xFF;
+         out.getRow(y)[x] = valuesByCharacter.at(value);
       }
    }
 }
@@ -39,7 +44,7 @@ void TextFormat::save(std::ostream &out, Image const &in) const
       auto end = it + in.getWidth();
       while (it != end)
       {
-         out << ((*it == 0xFF) ? 'O' : deadCell);
+         out << charactersByValue.at(*it);
          it++;
       }
       out << '\n';
