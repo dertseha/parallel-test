@@ -1,12 +1,11 @@
-cmake_minimum_required(VERSION 3.1...3.15)
+cmake_minimum_required(VERSION 3.14)
 project(game-of-life)
 
 ##################################################################
 ### Define sources                                             ###
 ##################################################################
-file(GLOB PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/main/cpp/*.cpp)
-#TODO: include dir export
-#set(PROJECT_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/main/h")
+file(GLOB_RECURSE PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/main/cpp *.cpp)
+file(GLOB_RECURSE PROJECT_HEADERS ${PROJECT_SOURCE_DIR}/main/h *.h)
 add_library(${PROJECT_NAME} STATIC)
 target_sources(${PROJECT_NAME} PUBLIC ${PROJECT_HEADERS} PRIVATE ${PROJECT_SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/main/h)
@@ -25,10 +24,12 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 ##################################################################
 macro(package_add_test TESTNAME TESTSOURCES)
     add_executable(${TESTNAME} ${ARGN})
-    add_gtest(${TESTNAME})
-    target_link_libraries(${TESTNAME} PUBLIC project-settings PRIVATE ${PROJECT_NAME})
+    target_link_libraries(${TESTNAME} PUBLIC project-settings PRIVATE ${PROJECT_NAME} GTest::gtest_main)
     target_sources(${TESTNAME} PRIVATE ${TESTSOURCES})
+
+    include(GoogleTest)
+    gtest_discover_tests(${TESTNAME})
 endmacro()
 
-file(GLOB TEST_SOURCES ${PROJECT_SOURCE_DIR}/test/cpp/*.cpp)
+file(GLOB_RECURSE TEST_SOURCES ${PROJECT_SOURCE_DIR}/test/cpp *.cpp)
 package_add_test(${PROJECT_NAME}-test ${TEST_SOURCES})

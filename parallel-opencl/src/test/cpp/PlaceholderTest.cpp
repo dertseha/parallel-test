@@ -1,9 +1,8 @@
-#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-class PlaceholderTest: public testing::Test
+class PlaceholderTest : public testing::Test
 {
 public:
-
 };
 
 TEST_F(PlaceholderTest, VerifyTestSystemWorks)

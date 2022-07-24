@@ -1,28 +1,22 @@
 cmake_minimum_required(VERSION 3.14)
-project(parallel-opencl)
-
-# OpenCL details
-find_package(OpenCL REQUIRED)
-INCLUDE_DIRECTORIES(${OpenCL_INCLUDE_DIRS})
-
-message(STATUS "OpenCL found: ${OPENCL_FOUND}")
-message(STATUS "OpenCL includes: ${OPENCL_INCLUDE_DIRS}")
-message(STATUS "OpenCL CXX includes: ${OPENCL_HAS_CPP_BINDINGS}")
-message(STATUS "OpenCL libraries: ${OPENCL_LIBRARIES}")
-message(STATUS "OpenCL library: ${OpenCL_LIBRARY}")
+project(parallel-cpu-single)
 
 ##################################################################
 ### Define sources                                             ###
 ##################################################################
 file(GLOB_RECURSE PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/main/cpp/core *.cpp)
 add_library(${PROJECT_NAME}-core STATIC)
+target_link_libraries(${PROJECT_NAME}-core
+        PRIVATE
+        game-of-life
+        )
 target_sources(${PROJECT_NAME}-core PUBLIC ${PROJECT_HEADERS} PRIVATE ${PROJECT_SOURCES})
 target_include_directories(${PROJECT_NAME}-core PUBLIC ${PROJECT_SOURCE_DIR}/main/h)
 
 ##################################################################
 ### Apply all settings                                         ###
 ##################################################################
-target_link_libraries(${PROJECT_NAME}-core PUBLIC project-settings PRIVATE ${OpenCL_LIBRARY})
+target_link_libraries(${PROJECT_NAME}-core PUBLIC project-settings)
 target_compile_options(${PROJECT_NAME}-core PRIVATE
         $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:-Wall>
         $<$<CXX_COMPILER_ID:MSVC>:-W4>

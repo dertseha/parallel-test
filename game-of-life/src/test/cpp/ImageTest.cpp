@@ -4,13 +4,11 @@
 
 using gol::Image;
 
-class ImageTest: public testing::Test
+class ImageTest : public testing::Test
 {
 public:
-
 };
 
 TEST_F(ImageTest, placeholder)
 {
-
 }
