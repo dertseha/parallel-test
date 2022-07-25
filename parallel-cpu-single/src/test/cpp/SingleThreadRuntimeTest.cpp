@@ -4,10 +4,14 @@
 #include "gol/Stopwatch.h"
 #include "gol/TextFormat.h"
 
+#include "test/ImageSamples.h"
+
 using cpu::SingleThreadRuntime;
 using gol::Image;
 using gol::Stopwatch;
 using gol::TextFormat;
+
+using test::ImageSamples;
 
 TEST(SingleThreadRuntimeTest, glider)
 {
@@ -39,17 +43,8 @@ TEST(SingleThreadRuntimeTest, glider)
 
 TEST(SingleThreadRuntimeTest, performance)
 {
-   auto format = TextFormat::withDefaults();
-   auto in = Image::create(5, 5);
-   std::istringstream glider(R"(
-.....
-..O..
-...O.
-.OOO.
-.....
-)");
-   format.load(*in, glider);
    SingleThreadRuntime runtime;
+   auto in = ImageSamples::random(10000, 10000);
    runtime.setInput(*in);
 
    Stopwatch watch;
@@ -60,15 +55,4 @@ TEST(SingleThreadRuntimeTest, performance)
       watch.stop();
    }
    std::cout << "average: " << std::to_string(watch.getAverage().count()) << "ns - total: " << std::to_string(watch.getCount()) << std::endl;
-   auto out = Image::create(5, 5);
-   runtime.getOutput(*out);
-   std::ostringstream result;
-   format.save(result, *out);
-   std::string expected(R"(.....
-.....
-.O.O.
-..OO.
-..O..
-)");
-   EXPECT_EQ(expected, result.str());
 }

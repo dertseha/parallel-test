@@ -32,6 +32,7 @@ target_link_libraries(${PROJECT_NAME}-test
         project-settings
         PRIVATE
         ${PROJECT_NAME}-core
+        game-of-life-test-support
         GTest::gtest_main
         )
 gtest_add_tests(TARGET ${PROJECT_NAME}-test)

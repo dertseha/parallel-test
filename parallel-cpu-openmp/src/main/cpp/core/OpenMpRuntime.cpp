@@ -11,7 +11,7 @@ using gol::Image;
 OpenMpRuntime::OpenMpRuntime()
 {
    int processorCount = omp_get_num_procs();
-   std::cout << "Processors: " << std::to_string(processorCount);
+   std::cout << "Processors: " << std::to_string(processorCount) << std::endl;
 }
 
 void OpenMpRuntime::setInput(Image const &data)
