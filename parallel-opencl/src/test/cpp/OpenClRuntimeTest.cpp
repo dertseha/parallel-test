@@ -57,20 +57,18 @@ TEST_P(OpenClRuntimeTest, glider)
    EXPECT_EQ(expected, result.str());
 }
 
-#if 0
-TEST(OpenClRuntimeTest, performance)
+TEST_P(OpenClRuntimeTest, performance)
 {
-   OpenClRuntime runtime;
+   auto runtime = GetParam();
    auto in = ImageSamples::random(10000, 10000);
-   runtime.setInput(*in);
+   runtime->setInput(*in);
 
    Stopwatch watch;
    while (!watch.hasOver(std::chrono::seconds(3)))
    {
       watch.start();
-      runtime.run();
+      runtime->run();
       watch.stop();
    }
    std::cout << "average: " << std::to_string(watch.getAverage().count()) << "ns - total: " << std::to_string(watch.getCount()) << std::endl;
 }
-#endif
