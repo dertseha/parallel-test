@@ -9,6 +9,8 @@ class OpenMpRuntime : public gol::Runtime
 public:
    OpenMpRuntime();
 
+   std::string getName() const override { return "OpenMpRuntime"; };
+
    void setInput(gol::Image const &data) override;
    void run() override;
    void getOutput(gol::Image &data) const override;

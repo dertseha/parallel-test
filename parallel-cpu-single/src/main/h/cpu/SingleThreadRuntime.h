@@ -7,6 +7,8 @@ namespace cpu
 class SingleThreadRuntime : public gol::Runtime
 {
 public:
+   std::string getName() const override { return "SingleThreadRuntime"; };
+
    void setInput(gol::Image const &data) override;
    void run() override;
    void getOutput(gol::Image &data) const override;
