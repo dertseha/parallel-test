@@ -1,18 +1,26 @@
+#include <cmrc/cmrc.hpp>
+
 #include "cl/OpenClRuntime.h"
 
 using cl::OpenClRuntime;
 using gol::Image;
 
-OpenClRuntime::OpenClRuntime(cl_context context, cl_command_queue commandQueue, std::string const &platformName, std::string const &deviceName)
+CMRC_DECLARE(res_cl);
+
+OpenClRuntime::OpenClRuntime(cl_context context, cl_command_queue commandQueue, std::string const &platformName, std::string const &deviceName,
+   cl_kernel kernel)
    : context(context)
    , commandQueue(commandQueue)
    , platformName(platformName)
    , deviceName(deviceName)
+   , kernel(kernel)
 {
 }
 
 OpenClRuntime::~OpenClRuntime()
 {
+   clReleaseKernel(kernel);
+   releaseImages();
    clReleaseCommandQueue(commandQueue);
    clReleaseContext(context);
 }
@@ -27,6 +35,7 @@ std::vector<std::shared_ptr<gol::Runtime>> OpenClRuntime::getAll()
    {
       return {};
    }
+
    std::vector<std::shared_ptr<gol::Runtime>> runtimes;
    for (auto platformId : platforms)
    {
@@ -51,7 +60,32 @@ std::vector<std::shared_ptr<gol::Runtime>> OpenClRuntime::getAll()
          cl_context context = clCreateContext(contextProperties, 1, &deviceId, nullptr, nullptr, &clStatus);
          cl_command_queue_properties queueProperties = 0;
          cl_command_queue commandQueue = clCreateCommandQueueWithProperties(context, deviceId, &queueProperties, &clStatus);
-         runtimes.emplace_back(new OpenClRuntime(context, commandQueue, platformName.data(), deviceName.data()));
+
+         auto fs = cmrc::res_cl::get_filesystem();
+         auto golFile = fs.open("game-of-life.cl");
+         std::string golSource(golFile.begin(), golFile.end());
+         char const *sources[1] = { golSource.c_str() };
+         auto program = clCreateProgramWithSource(context, 1, sources, nullptr, nullptr);
+         clBuildProgram(program, 1, &deviceId, nullptr, nullptr, nullptr);
+         {
+            size_t logSize = 0;
+            clGetProgramBuildInfo(program, deviceId, CL_PROGRAM_BUILD_LOG, 0, nullptr, &logSize);
+            std::vector<char> buildLog(logSize + 1, 0x00);
+            clGetProgramBuildInfo(program, deviceId, CL_PROGRAM_BUILD_LOG, logSize, buildLog.data(), &logSize);
+            printf("build:\n%s\n", buildLog.data());
+         }
+         auto kernel = clCreateKernel(program, "golKernel", nullptr);
+         {
+            size_t logSize = 0;
+            clGetProgramBuildInfo(program, deviceId, CL_PROGRAM_BUILD_LOG, 0, nullptr, &logSize);
+            std::vector<char> buildLog(logSize + 1, 0x00);
+            clGetProgramBuildInfo(program, deviceId, CL_PROGRAM_BUILD_LOG, logSize, buildLog.data(), &logSize);
+            printf("kernel:\n%s\n", buildLog.data());
+         }
+         // TODO: check if program needs to survive
+         // clReleaseProgram(program);
+
+         runtimes.emplace_back(new OpenClRuntime(context, commandQueue, platformName.data(), deviceName.data(), kernel));
       }
    }
    return runtimes;
@@ -59,12 +93,82 @@ std::vector<std::shared_ptr<gol::Runtime>> OpenClRuntime::getAll()
 
 void OpenClRuntime::setInput(Image const &data)
 {
+   releaseImages();
+   cl_int status = 0;
+
+   cl_image_format format;
+   memset(&format, 0x00, sizeof format);
+   format.image_channel_data_type = CL_UNSIGNED_INT8;
+   format.image_channel_order = CL_R;
+   {
+      cl_image_desc inputDesc;
+      memset(&inputDesc, 0x00, sizeof inputDesc);
+      inputDesc.image_type = CL_MEM_OBJECT_IMAGE2D;
+      inputDesc.image_width = data.getWidth();
+      inputDesc.image_height = data.getHeight();
+      inputDesc.image_depth = 1;
+      inputDesc.image_array_size = 1;
+      inputDesc.image_row_pitch = data.getStride();
+      inputDesc.image_slice_pitch = data.getStride() * data.getHeight();
+      inputDesc.num_mip_levels = 1;
+      input = clCreateImage(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, &format, &inputDesc, const_cast<void *>(reinterpret_cast<void const *>(data.getRow(0))), &status);
+   }
+   {
+      cl_image_desc outputDesc;
+      memset(&outputDesc, 0x00, sizeof outputDesc);
+      outputDesc.image_type = CL_MEM_OBJECT_IMAGE2D;
+      outputDesc.image_width = data.getWidth();
+      outputDesc.image_height = data.getHeight();
+      outputDesc.image_depth = 1;
+      outputDesc.image_array_size = 1;
+      outputDesc.image_row_pitch = 0; // data.getStride();
+      outputDesc.image_slice_pitch = 0; // data.getStride() * data.getHeight();
+      outputDesc.num_mip_levels = 1;
+      output = clCreateImage(context, CL_MEM_WRITE_ONLY, &format, &outputDesc, nullptr, &status);
+   }
+   width = data.getWidth();
+   height = data.getHeight();
 }
 
 void OpenClRuntime::run()
 {
+   clSetKernelArg(kernel, 0, sizeof(cl_mem), &input);
+   clSetKernelArg(kernel, 1, sizeof(cl_mem), &output);
+
+   size_t globalSizes[2] = { width, height };
+   size_t localSizes[2] = { 1, 1 };
+   size_t workDimension = 2;
+   auto status = clEnqueueNDRangeKernel(commandQueue, kernel, workDimension, nullptr, globalSizes, localSizes, 0, nullptr, nullptr);
+   if (status != CL_SUCCESS)
+   {
+      printf("!!!!! failed to enqueue kernel\n");
+   }
+   clFlush(commandQueue);
+   clFinish(commandQueue);
 }
 
 void OpenClRuntime::getOutput(Image &data) const
 {
+   if (output == nullptr)
+   {
+      return;
+   }
+
+   size_t origin[3] = { 0, 0, 0 };
+   size_t region[3] = { data.getWidth(), data.getHeight(), 1 };
+   clEnqueueReadImage(commandQueue, output, CL_TRUE, origin, region, data.getStride(), data.getStride() * data.getHeight(), data.getRow(0), 0, nullptr, nullptr);
+}
+
+void OpenClRuntime::releaseImages()
+{
+   if (output != nullptr)
+   {
+      clReleaseMemObject(output);
+      output = nullptr;
+   }
+   if (input != nullptr)
+   {
+      clReleaseMemObject(input);
+      input = nullptr;
+   }
 }

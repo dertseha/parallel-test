@@ -25,6 +25,9 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
+## Load resource compiler
+include(cmake/CMakeRC.cmake)
+
 ## Further modules
 add_subdirectory(game-of-life/src)
 add_subdirectory(parallel-cpu-single/src)

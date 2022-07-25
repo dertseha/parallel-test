@@ -11,12 +11,23 @@ message(STATUS "OpenCL CXX includes: ${OPENCL_HAS_CPP_BINDINGS}")
 message(STATUS "OpenCL libraries: ${OPENCL_LIBRARIES}")
 message(STATUS "OpenCL library: ${OpenCL_LIBRARY}")
 
+## CL library
+file(GLOB_RECURSE CL_SOURCES "${PROJECT_SOURCE_DIR}/main/cl/*.cl")
+cmrc_add_resource_library(resources-cl NAMESPACE res_cl WHENCE "${PROJECT_SOURCE_DIR}/main/cl/" ${CL_SOURCES})
+
 ## Core library
 file(GLOB_RECURSE PROJECT_SOURCES "${PROJECT_SOURCE_DIR}/main/cpp/core/*.cpp")
 add_library(${PROJECT_NAME}-core STATIC)
 target_sources(${PROJECT_NAME}-core PRIVATE ${PROJECT_SOURCES})
 target_include_directories(${PROJECT_NAME}-core PUBLIC ${PROJECT_SOURCE_DIR}/main/h)
-target_link_libraries(${PROJECT_NAME}-core PUBLIC project-settings game-of-life PRIVATE ${OpenCL_LIBRARY})
+target_link_libraries(${PROJECT_NAME}-core
+        PUBLIC
+        project-settings
+        game-of-life
+        PRIVATE
+        resources-cl
+        ${OpenCL_LIBRARY}
+        )
 target_compile_options(${PROJECT_NAME}-core PRIVATE
         $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:-Wall>
         $<$<CXX_COMPILER_ID:MSVC>:-W4>

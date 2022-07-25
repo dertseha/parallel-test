@@ -34,11 +34,21 @@ public:
    void getOutput(gol::Image &data) const override;
 
 private:
-   OpenClRuntime(cl_context context, cl_command_queue commandQueue, std::string const &platformName, std::string const &deviceName);
+   OpenClRuntime(cl_context context, cl_command_queue commandQueue, std::string const &platformName, std::string const &deviceName,
+      cl_kernel kernel);
+
+   void releaseImages();
 
    cl_context context;
    cl_command_queue commandQueue;
    std::string platformName;
    std::string deviceName;
+
+   cl_kernel kernel;
+
+   cl_mem input = nullptr;
+   cl_mem output = nullptr;
+   size_t width = 0;
+   size_t height = 0;
 };
 }
