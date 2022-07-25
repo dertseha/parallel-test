@@ -28,4 +28,5 @@ FetchContent_MakeAvailable(googletest)
 ## Further modules
 add_subdirectory(game-of-life/src)
 add_subdirectory(parallel-cpu-single/src)
+add_subdirectory(parallel-cpu-openmp/src)
 add_subdirectory(parallel-opencl/src)

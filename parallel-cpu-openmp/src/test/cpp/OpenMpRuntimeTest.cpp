@@ -1,15 +1,15 @@
 #include <gtest/gtest.h>
 
-#include "cpu/SingleThreadRuntime.h"
-#include "gol/Stopwatch.h"
+#include "cpu/OpenMpRuntime.h"
 #include "gol/TextFormat.h"
+#include "gol/Stopwatch.h"
 
-using cpu::SingleThreadRuntime;
+using cpu::OpenMpRuntime;
 using gol::Image;
-using gol::Stopwatch;
 using gol::TextFormat;
+using gol::Stopwatch;
 
-TEST(SingleThreadRuntimeTest, glider)
+TEST(OpenMpRuntimeTest, glider)
 {
    auto format = TextFormat::withDefaults();
    auto in = Image::create(5, 5);
@@ -21,7 +21,7 @@ TEST(SingleThreadRuntimeTest, glider)
 .....
 )");
    format.load(*in, glider);
-   SingleThreadRuntime runtime;
+   OpenMpRuntime runtime;
    runtime.setInput(*in);
    runtime.run();
    auto out = Image::create(5, 5);
@@ -49,7 +49,7 @@ TEST(SingleThreadRuntimeTest, performance)
 .....
 )");
    format.load(*in, glider);
-   SingleThreadRuntime runtime;
+   OpenMpRuntime runtime;
    runtime.setInput(*in);
 
    Stopwatch watch;
