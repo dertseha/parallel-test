@@ -3,7 +3,7 @@
 #include "cl/OpenClRuntime.h"
 
 using cl::OpenClRuntime;
-using gol::Image;
+using gol::Buffer2d;
 
 CMRC_DECLARE(res_cl);
 
@@ -91,7 +91,7 @@ std::vector<std::shared_ptr<gol::Runtime>> OpenClRuntime::getAll()
    return runtimes;
 }
 
-void OpenClRuntime::setInput(Image const &data)
+void OpenClRuntime::setInput(Buffer2d const &data)
 {
    releaseImages();
    cl_int status = 0;
@@ -147,7 +147,7 @@ void OpenClRuntime::run()
    clFinish(commandQueue);
 }
 
-void OpenClRuntime::getOutput(Image &data) const
+void OpenClRuntime::getOutput(Buffer2d &data) const
 {
    if (output == nullptr)
    {

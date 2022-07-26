@@ -1,16 +1,16 @@
 #include "cpu/SingleThreadRuntime.h"
 
 using cpu::SingleThreadRuntime;
-using gol::Image;
+using gol::Buffer2d;
 
-void SingleThreadRuntime::setInput(Image const &data)
+void SingleThreadRuntime::setInput(Buffer2d const &data)
 {
-   input = Image::create(data.getWidth(), data.getHeight());
+   input = Buffer2d::create(data.getWidth(), data.getHeight());
    for (size_t y = 0; y < data.getHeight(); y++)
    {
       memcpy(input->getRow(y), data.getRow(y), data.getWidth());
    }
-   output = Image::create(data.getWidth(), data.getHeight());
+   output = Buffer2d::create(data.getWidth(), data.getHeight());
 }
 
 void SingleThreadRuntime::run()
@@ -30,7 +30,7 @@ void SingleThreadRuntime::run()
    }
 }
 
-void SingleThreadRuntime::getOutput(Image &data) const
+void SingleThreadRuntime::getOutput(Buffer2d &data) const
 {
    for (size_t y = 0; y < data.getHeight(); y++)
    {

@@ -6,7 +6,7 @@
 #include "cpu/OpenMpRuntime.h"
 
 using cpu::OpenMpRuntime;
-using gol::Image;
+using gol::Buffer2d;
 
 OpenMpRuntime::OpenMpRuntime()
 {
@@ -14,14 +14,14 @@ OpenMpRuntime::OpenMpRuntime()
    std::cout << "Processors: " << std::to_string(processorCount) << std::endl;
 }
 
-void OpenMpRuntime::setInput(Image const &data)
+void OpenMpRuntime::setInput(Buffer2d const &data)
 {
-   input = Image::create(data.getWidth(), data.getHeight());
+   input = Buffer2d::create(data.getWidth(), data.getHeight());
    for (size_t y = 0; y < data.getHeight(); y++)
    {
       memcpy(input->getRow(y), data.getRow(y), data.getWidth());
    }
-   output = Image::create(data.getWidth(), data.getHeight());
+   output = Buffer2d::create(data.getWidth(), data.getHeight());
 }
 
 void OpenMpRuntime::run()
@@ -44,7 +44,7 @@ void OpenMpRuntime::run()
    }
 }
 
-void OpenMpRuntime::getOutput(Image &data) const
+void OpenMpRuntime::getOutput(Buffer2d &data) const
 {
    for (size_t y = 0; y < data.getHeight(); y++)
    {

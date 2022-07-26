@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "gol/Image.h"
+#include "gol/Buffer2d.h"
 
 namespace gol
 {
@@ -13,8 +13,8 @@ public:
 
    virtual std::string getName() const = 0;
 
-   virtual void setInput(gol::Image const &data) = 0;
+   virtual void setInput(gol::Buffer2d const &data) = 0;
    virtual void run() = 0;
-   virtual void getOutput(gol::Image &data) const = 0;
+   virtual void getOutput(gol::Buffer2d &data) const = 0;
 };
 }

@@ -5,15 +5,15 @@
 
 namespace gol
 {
-class Image
+class Buffer2d
 {
 public:
-   Image(Image const &) = delete;
-   ~Image();
+   Buffer2d(Buffer2d const &) = delete;
+   ~Buffer2d();
 
-   static std::unique_ptr<Image> create(size_t width, size_t height);
+   static std::unique_ptr<Buffer2d> create(size_t width, size_t height);
 
-   Image &operator=(Image const &) = delete;
+   Buffer2d &operator=(Buffer2d const &) = delete;
 
    size_t getWidth() const;
    size_t getHeight() const;
@@ -23,7 +23,7 @@ public:
    uint8_t const *getRow(size_t index) const;
 
 private:
-   Image(size_t width, size_t height, uint8_t *data, uint8_t *plane, size_t stride);
+   Buffer2d(size_t width, size_t height, uint8_t *data, uint8_t *plane, size_t stride);
 
    size_t width;
    size_t height;

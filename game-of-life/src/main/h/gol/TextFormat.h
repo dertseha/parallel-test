@@ -3,7 +3,7 @@
 #include <istream>
 #include <map>
 
-#include "gol/Image.h"
+#include "gol/Buffer2d.h"
 
 namespace gol
 {
@@ -12,8 +12,8 @@ class TextFormat
 public:
    static TextFormat withDefaults();
 
-   void load(Image &out, std::istream &in) const;
-   void save(std::ostream &out, Image const &in) const;
+   void load(Buffer2d &out, std::istream &in) const;
+   void save(std::ostream &out, Buffer2d const &in) const;
 
 private:
    explicit TextFormat(std::map<uint8_t, char> const &charactersByValue);

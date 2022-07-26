@@ -1,6 +1,6 @@
 #include "gol/TextFormat.h"
 
-using gol::Image;
+using gol::Buffer2d;
 using gol::TextFormat;
 
 TextFormat::TextFormat(std::map<uint8_t, char> const &charactersByValue)
@@ -18,7 +18,7 @@ TextFormat TextFormat::withDefaults()
    return TextFormat(charactersByValue);
 }
 
-void TextFormat::load(Image &out, std::istream &in) const
+void TextFormat::load(Buffer2d &out, std::istream &in) const
 {
    for (size_t y = 0; y < out.getHeight(); y++)
    {
@@ -36,7 +36,7 @@ void TextFormat::load(Image &out, std::istream &in) const
    }
 }
 
-void TextFormat::save(std::ostream &out, Image const &in) const
+void TextFormat::save(std::ostream &out, Buffer2d const &in) const
 {
    for (size_t y = 0; y < in.getHeight(); y++)
    {

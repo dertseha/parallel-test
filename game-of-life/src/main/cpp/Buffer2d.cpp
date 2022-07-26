@@ -1,10 +1,10 @@
 #include <cstring>
 
-#include "gol/Image.h"
+#include "gol/Buffer2d.h"
 
-using gol::Image;
+using gol::Buffer2d;
 
-Image::Image(size_t width, size_t height, uint8_t *data, uint8_t *plane, size_t stride)
+Buffer2d::Buffer2d(size_t width, size_t height, uint8_t *data, uint8_t *plane, size_t stride)
    : width(width)
    , height(height)
    , data(data)
@@ -13,12 +13,12 @@ Image::Image(size_t width, size_t height, uint8_t *data, uint8_t *plane, size_t 
 {
 }
 
-Image::~Image()
+Buffer2d::~Buffer2d()
 {
    delete[] data;
 }
 
-std::unique_ptr<Image> Image::create(size_t width, size_t height)
+std::unique_ptr<Buffer2d> Buffer2d::create(size_t width, size_t height)
 {
    static ptrdiff_t const alignmentSize = 32;
    static ptrdiff_t const alignmentPadding = alignmentSize - 1;
@@ -28,30 +28,30 @@ std::unique_ptr<Image> Image::create(size_t width, size_t height)
    memset(data, 0x00, dataSize);
    ptrdiff_t dataAddress = reinterpret_cast<ptrdiff_t>(data);
    ptrdiff_t alignedAddress = ((dataAddress + alignmentPadding) / alignmentSize) * alignmentSize;
-   return std::unique_ptr<Image>(new Image(width, height, data, reinterpret_cast<uint8_t *>(alignedAddress), stride));
+   return std::unique_ptr<Buffer2d>(new Buffer2d(width, height, data, reinterpret_cast<uint8_t *>(alignedAddress), stride));
 }
 
-size_t Image::getWidth() const
+size_t Buffer2d::getWidth() const
 {
    return width;
 }
 
-size_t Image::getHeight() const
+size_t Buffer2d::getHeight() const
 {
    return height;
 }
 
-size_t Image::getStride() const
+size_t Buffer2d::getStride() const
 {
    return stride;
 }
 
-uint8_t *Image::getRow(size_t index)
+uint8_t *Buffer2d::getRow(size_t index)
 {
    return plane + (stride * index);
 }
 
-uint8_t const *Image::getRow(size_t index) const
+uint8_t const *Buffer2d::getRow(size_t index) const
 {
    return plane + (stride * index);
 }

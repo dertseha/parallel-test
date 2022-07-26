@@ -29,9 +29,9 @@ public:
 
    static std::vector<std::shared_ptr<gol::Runtime>> getAll();
 
-   void setInput(gol::Image const &data) override;
+   void setInput(gol::Buffer2d const &data) override;
    void run() override;
-   void getOutput(gol::Image &data) const override;
+   void getOutput(gol::Buffer2d &data) const override;
 
 private:
    OpenClRuntime(cl_context context, cl_command_queue commandQueue, std::string const &platformName, std::string const &deviceName,

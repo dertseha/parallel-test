@@ -6,14 +6,14 @@
 #include "gol/Stopwatch.h"
 #include "gol/TextFormat.h"
 
-#include "test/ImageSamples.h"
+#include "test/Buffer2dSamples.h"
 
 using cl::OpenClRuntime;
-using gol::Image;
+using gol::Buffer2d;
 using gol::Stopwatch;
 using gol::TextFormat;
 
-using test::ImageSamples;
+using test::Buffer2dSamples;
 
 class OpenClRuntimeTest : public testing::Test, public testing::WithParamInterface<std::shared_ptr<gol::Runtime>>
 {
@@ -32,7 +32,7 @@ TEST_P(OpenClRuntimeTest, glider)
    auto runtime = GetParam();
 
    auto format = TextFormat::withDefaults();
-   auto in = Image::create(5, 5);
+   auto in = Buffer2d::create(5, 5);
    std::istringstream glider(R"(
 .....
 ..O..
@@ -44,7 +44,7 @@ TEST_P(OpenClRuntimeTest, glider)
 
    runtime->setInput(*in);
    runtime->run();
-   auto out = Image::create(5, 5);
+   auto out = Buffer2d::create(5, 5);
    runtime->getOutput(*out);
    std::ostringstream result;
    format.save(result, *out);
@@ -60,7 +60,7 @@ TEST_P(OpenClRuntimeTest, glider)
 TEST_P(OpenClRuntimeTest, performance)
 {
    auto runtime = GetParam();
-   auto in = ImageSamples::random(10000, 10000);
+   auto in = Buffer2dSamples::random(10000, 10000);
    runtime->setInput(*in);
 
    Stopwatch watch;
