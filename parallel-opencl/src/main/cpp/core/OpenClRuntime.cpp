@@ -82,8 +82,7 @@ std::vector<std::shared_ptr<gol::Runtime>> OpenClRuntime::getAll()
             clGetProgramBuildInfo(program, deviceId, CL_PROGRAM_BUILD_LOG, logSize, buildLog.data(), &logSize);
             printf("kernel:\n%s\n", buildLog.data());
          }
-         // TODO: check if program needs to survive
-         // clReleaseProgram(program);
+         clReleaseProgram(program);
 
          runtimes.emplace_back(new OpenClRuntime(context, commandQueue, platformName.data(), deviceName.data(), kernel));
       }
@@ -138,11 +137,7 @@ void OpenClRuntime::run()
    size_t globalSizes[2] = { width, height };
    size_t localSizes[2] = { 1, 1 };
    size_t workDimension = 2;
-   auto status = clEnqueueNDRangeKernel(commandQueue, kernel, workDimension, nullptr, globalSizes, localSizes, 0, nullptr, nullptr);
-   if (status != CL_SUCCESS)
-   {
-      printf("!!!!! failed to enqueue kernel\n");
-   }
+   clEnqueueNDRangeKernel(commandQueue, kernel, workDimension, nullptr, globalSizes, localSizes, 0, nullptr, nullptr);
    clFlush(commandQueue);
    clFinish(commandQueue);
 }
