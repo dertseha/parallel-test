@@ -22,6 +22,8 @@ public:
    uint8_t *getRow(size_t index);
    uint8_t const *getRow(size_t index) const;
 
+   void copyFrom(Buffer2d const &other);
+
 private:
    Buffer2d(size_t width, size_t height, uint8_t *data, uint8_t *plane, size_t stride);
 

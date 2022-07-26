@@ -6,10 +6,7 @@ using gol::Buffer2d;
 void SingleThreadRuntime::setInput(Buffer2d const &data)
 {
    input = Buffer2d::create(data.getWidth(), data.getHeight());
-   for (size_t y = 0; y < data.getHeight(); y++)
-   {
-      memcpy(input->getRow(y), data.getRow(y), data.getWidth());
-   }
+   input->copyFrom(data);
    output = Buffer2d::create(data.getWidth(), data.getHeight());
 }
 
@@ -32,10 +29,7 @@ void SingleThreadRuntime::run()
 
 void SingleThreadRuntime::getOutput(Buffer2d &data) const
 {
-   for (size_t y = 0; y < data.getHeight(); y++)
-   {
-      memcpy(data.getRow(y), output->getRow(y), data.getWidth());
-   }
+   data.copyFrom(*output);
 }
 
 bool SingleThreadRuntime::isAliveAt(ptrdiff_t x, ptrdiff_t y) const

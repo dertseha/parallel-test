@@ -55,3 +55,15 @@ uint8_t const *Buffer2d::getRow(size_t index) const
 {
    return plane + (stride * index);
 }
+
+void Buffer2d::copyFrom(Buffer2d const &other)
+{
+   if ((width != other.width) || (height != other.height))
+   {
+      return;
+   }
+   for (size_t y = 0; y < height; y++)
+   {
+      memcpy(getRow(y), other.getRow(y), width);
+   }
+}

@@ -17,10 +17,7 @@ OpenMpRuntime::OpenMpRuntime()
 void OpenMpRuntime::setInput(Buffer2d const &data)
 {
    input = Buffer2d::create(data.getWidth(), data.getHeight());
-   for (size_t y = 0; y < data.getHeight(); y++)
-   {
-      memcpy(input->getRow(y), data.getRow(y), data.getWidth());
-   }
+   input->copyFrom(data);
    output = Buffer2d::create(data.getWidth(), data.getHeight());
 }
 
@@ -46,10 +43,7 @@ void OpenMpRuntime::run()
 
 void OpenMpRuntime::getOutput(Buffer2d &data) const
 {
-   for (size_t y = 0; y < data.getHeight(); y++)
-   {
-      memcpy(data.getRow(y), output->getRow(y), data.getWidth());
-   }
+   data.copyFrom(*output);
 }
 
 bool OpenMpRuntime::isAliveAt(ptrdiff_t x, ptrdiff_t y) const
