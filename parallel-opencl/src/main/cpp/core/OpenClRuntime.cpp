@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <cmrc/cmrc.hpp>
 
 #include "cl/OpenClRuntime.h"
@@ -67,21 +69,9 @@ std::vector<std::shared_ptr<gol::Runtime>> OpenClRuntime::getAll()
          char const *sources[1] = { golSource.c_str() };
          auto program = clCreateProgramWithSource(context, 1, sources, nullptr, nullptr);
          clBuildProgram(program, 1, &deviceId, nullptr, nullptr, nullptr);
-         {
-            size_t logSize = 0;
-            clGetProgramBuildInfo(program, deviceId, CL_PROGRAM_BUILD_LOG, 0, nullptr, &logSize);
-            std::vector<char> buildLog(logSize + 1, 0x00);
-            clGetProgramBuildInfo(program, deviceId, CL_PROGRAM_BUILD_LOG, logSize, buildLog.data(), &logSize);
-            printf("build:\n%s\n", buildLog.data());
-         }
+         checkBuildLog(deviceId, program, "buildProgram");
          auto kernel = clCreateKernel(program, "golKernel", nullptr);
-         {
-            size_t logSize = 0;
-            clGetProgramBuildInfo(program, deviceId, CL_PROGRAM_BUILD_LOG, 0, nullptr, &logSize);
-            std::vector<char> buildLog(logSize + 1, 0x00);
-            clGetProgramBuildInfo(program, deviceId, CL_PROGRAM_BUILD_LOG, logSize, buildLog.data(), &logSize);
-            printf("kernel:\n%s\n", buildLog.data());
-         }
+         checkBuildLog(deviceId, program, "buildKernel");
          clReleaseProgram(program);
 
          runtimes.emplace_back(new OpenClRuntime(context, commandQueue, platformName.data(), deviceName.data(), kernel));
@@ -120,8 +110,8 @@ void OpenClRuntime::setInput(Buffer2d const &data)
       outputDesc.image_height = data.getHeight();
       outputDesc.image_depth = 1;
       outputDesc.image_array_size = 1;
-      outputDesc.image_row_pitch = 0; // data.getStride();
-      outputDesc.image_slice_pitch = 0; // data.getStride() * data.getHeight();
+      outputDesc.image_row_pitch = 0;
+      outputDesc.image_slice_pitch = 0;
       outputDesc.num_mip_levels = 1;
       output = clCreateImage(context, CL_MEM_WRITE_ONLY, &format, &outputDesc, nullptr, &status);
    }
@@ -165,5 +155,18 @@ void OpenClRuntime::releaseImages()
    {
       clReleaseMemObject(input);
       input = nullptr;
+   }
+}
+
+void OpenClRuntime::checkBuildLog(cl_device_id deviceId, cl_program program, std::string const &step)
+{
+   size_t logSize = 0;
+   clGetProgramBuildInfo(program, deviceId, CL_PROGRAM_BUILD_LOG, 0, nullptr, &logSize);
+   std::vector<char> buildLog(logSize + 1, 0x00);
+   clGetProgramBuildInfo(program, deviceId, CL_PROGRAM_BUILD_LOG, logSize, buildLog.data(), nullptr);
+   if (logSize > 1)
+   {
+      std::cout << step << ":" << std::endl
+                << buildLog.data() << std::endl;
    }
 }

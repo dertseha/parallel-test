@@ -38,6 +38,7 @@ private:
       cl_kernel kernel);
 
    void releaseImages();
+   static void checkBuildLog(cl_device_id deviceId, cl_program program, std::string const &step);
 
    cl_context context;
    cl_command_queue commandQueue;
