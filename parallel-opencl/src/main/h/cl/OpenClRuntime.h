@@ -34,7 +34,7 @@ public:
    void getOutput(gol::Buffer2d &data) const override;
 
 private:
-   OpenClRuntime(cl_context context, cl_command_queue commandQueue, std::string const &platformName, std::string const &deviceName,
+   OpenClRuntime(cl_context context, cl_command_queue commandQueue, std::string platformName, std::string deviceName,
       cl_kernel kernel);
 
    void releaseImages();

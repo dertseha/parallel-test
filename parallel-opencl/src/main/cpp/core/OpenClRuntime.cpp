@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <cmrc/cmrc.hpp>
+#include <utility>
 
 #include "cl/OpenClRuntime.h"
 
@@ -9,12 +10,12 @@ using gol::Buffer2d;
 
 CMRC_DECLARE(res_cl);
 
-OpenClRuntime::OpenClRuntime(cl_context context, cl_command_queue commandQueue, std::string const &platformName, std::string const &deviceName,
+OpenClRuntime::OpenClRuntime(cl_context context, cl_command_queue commandQueue, std::string platformName, std::string deviceName,
    cl_kernel kernel)
    : context(context)
    , commandQueue(commandQueue)
-   , platformName(platformName)
-   , deviceName(deviceName)
+   , platformName(std::move(platformName))
+   , deviceName(std::move(deviceName))
    , kernel(kernel)
 {
 }
