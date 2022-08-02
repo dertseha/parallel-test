@@ -100,8 +100,9 @@ void OpenClRuntime::setInput(Buffer2d const &data)
       inputDesc.image_array_size = 1;
       inputDesc.image_row_pitch = data.getStride();
       inputDesc.image_slice_pitch = data.getStride() * data.getHeight();
-      inputDesc.num_mip_levels = 1;
-      input = clCreateImage(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, &format, &inputDesc, const_cast<void *>(reinterpret_cast<void const *>(data.getRow(0))), &status);
+      inputDesc.num_mip_levels = 0;
+      input = clCreateImage(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR | CL_MEM_HOST_WRITE_ONLY, &format, &inputDesc,
+         const_cast<void *>(reinterpret_cast<void const *>(data.getRow(0))), &status);
    }
    {
       cl_image_desc outputDesc;
@@ -113,8 +114,8 @@ void OpenClRuntime::setInput(Buffer2d const &data)
       outputDesc.image_array_size = 1;
       outputDesc.image_row_pitch = 0;
       outputDesc.image_slice_pitch = 0;
-      outputDesc.num_mip_levels = 1;
-      output = clCreateImage(context, CL_MEM_WRITE_ONLY, &format, &outputDesc, nullptr, &status);
+      outputDesc.num_mip_levels = 0;
+      output = clCreateImage(context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_READ_ONLY, &format, &outputDesc, nullptr, &status);
    }
    width = data.getWidth();
    height = data.getHeight();
