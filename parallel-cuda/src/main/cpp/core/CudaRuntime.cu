@@ -1,6 +1,3 @@
-#include <iostream>
-#include <string>
-
 #include <cuda_runtime.h>
 
 #include "cuda/CudaRuntime.h"
@@ -23,18 +20,24 @@ __device__ size_t aliveCountAt(ptrdiff_t x, ptrdiff_t y, uint8_t *image, size_t 
 
 __global__ void golKernel(uint8_t *input, size_t inputStride, uint8_t *output, size_t outputStride, size_t width, size_t height)
 {
-   ptrdiff_t x = blockIdx.x * blockDim.x + threadIdx.x;
-   ptrdiff_t y = blockIdx.y * blockDim.y + threadIdx.y;
+   for (ptrdiff_t deltaY = threadIdx.y; deltaY < height; deltaY += (blockDim.y * gridDim.y))
+   {
+      for (ptrdiff_t deltaX = threadIdx.x; deltaX < width; deltaX += (blockDim.x * gridDim.x))
+      {
+         ptrdiff_t x = blockIdx.x * blockDim.x + deltaX;
+         ptrdiff_t y = blockIdx.y * blockDim.y + deltaY;
 
-   bool selfAlive = isAliveAt(x, y, input, inputStride, width, height);
-   size_t aliveNeighbors = //
-      aliveCountAt(x - 1, y - 1, input, inputStride, width, height) + aliveCountAt(x, y - 1, input, inputStride, width, height) + aliveCountAt(x + 1, y - 1, input, inputStride, width, height) + //
-      aliveCountAt(x - 1, y, input, inputStride, width, height) + aliveCountAt(x + 1, y, input, inputStride, width, height) + //
-      aliveCountAt(x - 1, y + 1, input, inputStride, width, height) + aliveCountAt(x, y + 1, input, inputStride, width, height) + aliveCountAt(x + 1, y + 1, input, inputStride, width, height);
-   bool shallBeAlive = (selfAlive && (aliveNeighbors == 2 || aliveNeighbors == 3)) || (!selfAlive && (aliveNeighbors == 3));
+         bool selfAlive = isAliveAt(x, y, input, inputStride, width, height);
+         size_t aliveNeighbors = //
+            aliveCountAt(x - 1, y - 1, input, inputStride, width, height) + aliveCountAt(x, y - 1, input, inputStride, width, height) + aliveCountAt(x + 1, y - 1, input, inputStride, width, height) + //
+            aliveCountAt(x - 1, y, input, inputStride, width, height) + aliveCountAt(x + 1, y, input, inputStride, width, height) + //
+            aliveCountAt(x - 1, y + 1, input, inputStride, width, height) + aliveCountAt(x, y + 1, input, inputStride, width, height) + aliveCountAt(x + 1, y + 1, input, inputStride, width, height);
+         bool shallBeAlive = (selfAlive && (aliveNeighbors == 2 || aliveNeighbors == 3)) || (!selfAlive && (aliveNeighbors == 3));
 
-   uint8_t *row = output + outputStride * y;
-   row[x] = shallBeAlive ? 0xFF : 0x00;
+         uint8_t *row = output + outputStride * y;
+         row[x] = shallBeAlive ? 0xFF : 0x00;
+      }
+   }
 }
 
 CudaRuntime::CudaRuntime()
