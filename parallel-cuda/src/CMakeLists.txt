@@ -1,8 +1,21 @@
-cmake_minimum_required(VERSION 3.14)
-project(parallel-cuda)
+cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
+
+## CUDA version
+# There are several approaches how this is to be done.
+# the following is the result of various attempts, based on these links
+# https://developer.nvidia.com/blog/building-cuda-applications-cmake/
+# https://stackoverflow.com/questions/68223398/how-can-i-get-cmake-to-automatically-detect-the-value-for-cuda-architectures
+# https://stackoverflow.com/questions/70534577/specify-the-cuda-architecture-by-using-cmake-for-cuda-compilation
+# https://cmake.org/cmake/help/latest/variable/CMAKE_CUDA_ARCHITECTURES.html#variable:CMAKE_CUDA_ARCHITECTURES
+
+if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+    set(CMAKE_CUDA_ARCHITECTURES 53)
+endif()
+
+project(parallel-cuda LANGUAGES CXX CUDA)
 
 ## Core library
-file(GLOB_RECURSE PROJECT_SOURCES "${PROJECT_SOURCE_DIR}/main/cpp/core/*.cpp")
+file(GLOB_RECURSE PROJECT_SOURCES "${PROJECT_SOURCE_DIR}/main/cpp/core/*.cu" "${PROJECT_SOURCE_DIR}/main/cpp/core/*.cpp")
 add_library(${PROJECT_NAME}-core STATIC)
 target_sources(${PROJECT_NAME}-core PRIVATE ${PROJECT_SOURCES})
 target_include_directories(${PROJECT_NAME}-core PUBLIC ${PROJECT_SOURCE_DIR}/main/h)
@@ -11,6 +24,7 @@ target_compile_options(${PROJECT_NAME}-core PRIVATE
         $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:-Wall>
         $<$<CXX_COMPILER_ID:MSVC>:-W4>
         )
+set_target_properties(${PROJECT_NAME}-core PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
 ## Main executable
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/main/cpp/main.cpp)
