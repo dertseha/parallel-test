@@ -4,7 +4,7 @@ bool isAliveAt(__read_only image2d_t input, int2 coord)
          CLK_ADDRESS_REPEAT | // wrap around coordinates
          CLK_FILTER_NEAREST;
    uint4 pixel = read_imageui(input, smp, coord);
-   return pixel[0] > 0;
+   return pixel.x > 0;
 }
 
 int aliveCountAt(__read_only image2d_t input, int2 coord)

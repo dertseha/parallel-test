@@ -142,7 +142,7 @@ void OpenClRuntime::getOutput(Buffer2d &data) const
 
    size_t origin[3] = { 0, 0, 0 };
    size_t region[3] = { data.getWidth(), data.getHeight(), 1 };
-   clEnqueueReadImage(commandQueue, output, CL_TRUE, origin, region, data.getStride(), data.getStride() * data.getHeight(), data.getRow(0), 0, nullptr, nullptr);
+   clEnqueueReadImage(commandQueue, output, CL_TRUE, origin, region, data.getStride(), 0, data.getRow(0), 0, nullptr, nullptr);
 }
 
 void OpenClRuntime::releaseImages()
