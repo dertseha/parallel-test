@@ -3,13 +3,13 @@ bool isAliveAt(__read_only image2d_t input, int2 coord)
     const sampler_t smp = CLK_NORMALIZED_COORDS_FALSE | // pixel coordinates
          CLK_ADDRESS_REPEAT | // wrap around coordinates
          CLK_FILTER_NEAREST;
-   uint4 pixel = read_imageui(input, smp, coord);
-   return pixel.x > 0;
+    uint4 pixel = read_imageui(input, smp, coord);
+    return pixel.x > 0;
 }
 
 int aliveCountAt(__read_only image2d_t input, int2 coord)
 {
-   return isAliveAt(input, coord) ? 1 : 0;
+    return isAliveAt(input, coord) ? 1 : 0;
 }
 
 __kernel
