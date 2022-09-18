@@ -119,6 +119,8 @@ void OpenClRuntime::setInput(Buffer2d const &data)
    }
    width = data.getWidth();
    height = data.getHeight();
+   clFlush(commandQueue);
+   clFinish(commandQueue);
 }
 
 void OpenClRuntime::run()

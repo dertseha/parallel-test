@@ -42,6 +42,7 @@ __global__ void golKernel(uint8_t *input, size_t inputStride, uint8_t *output, s
 
 CudaRuntime::CudaRuntime()
 {
+   cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync);
 }
 
 CudaRuntime::~CudaRuntime()
@@ -64,7 +65,7 @@ void CudaRuntime::run()
 {
    dim3 localSize(1, 1);
    dim3 globalSize((static_cast<decltype(localSize.x)>(width) + localSize.x - 1) / localSize.x,
-                   (static_cast<decltype(localSize.y)>(height) + localSize.y - 1) / localSize.y);
+      (static_cast<decltype(localSize.y)>(height) + localSize.y - 1) / localSize.y);
    golKernel<<<globalSize, localSize>>>(input, inputStride, output, outputStride, width, height);
    cudaDeviceSynchronize();
 }
